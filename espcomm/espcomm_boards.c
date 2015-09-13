@@ -84,6 +84,27 @@ void board_ck_ra()
     serialport_set_rts(0);
 }
 
+// "bub" board: dtr pulls down reset, rts pulls down gpio0
+// allows for USB-BUB-II's capacitive (A/C) coupling on dtr for reset
+
+void board_bub_rb()
+{
+    serialport_set_dtr(1);
+    serialport_set_rts(0);
+    espcomm_delay_ms(5);
+    serialport_set_dtr(0);
+    espcomm_delay_ms(250); // wait for bootloader to engage
+    serialport_set_rts(0);
+}
+
+void board_bub_ra()
+{
+    serialport_set_rts(0);
+    serialport_set_dtr(1);
+    espcomm_delay_ms(5);
+    serialport_set_dtr(0);
+}
+
 // WIFIO board, rev 2: TXD controls gpio0 via a pnp, and DTR controls rst via a capacitor
 
 void board_wifio_rb()
@@ -130,6 +151,7 @@ static espcomm_board_t s_boards[] = {
     { "ck",     &board_ck_rb,       &board_ck_ra    },
     { "wifio",  &board_wifio_rb,    &board_wifio_ra},
     { "nodemcu",   &board_nodemcu_rb,     &board_nodemcu_ra},
+    { "bub",    &board_bub_rb,      &board_bub_ra    },
 };
 
 static size_t s_boards_count = sizeof(s_boards) / sizeof(espcomm_board_t);
